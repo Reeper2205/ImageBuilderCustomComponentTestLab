@@ -1,39 +1,40 @@
 # ImageBuilderCustomComponentTestLab
-This CloudFormation template sets up an AWS Image Builder environment for creating and managing custom AMIs (Amazon Machine Images). Here's a breakdown of its main components:
+This CloudFormation template creates a Windows-based test environment, specifically designed for AWS Test Orchestrator for EC2 (TOE). Here's a breakdown of its main components:
 
     Network Infrastructure:
 
-    Creates a VPC with public and private subnets
-    Sets up NAT Gateway for private subnet internet access
-    Configures Internet Gateway for public subnet
-    Creates necessary route tables and associations
+    VPC with CIDR 10.0.0.0/16
+    Public subnet (10.0.1.0/24)
+    Private subnet (10.0.2.0/24)
+    NAT Gateway and Internet Gateway
+    Appropriate route tables for both subnets
 
-    Security Components:
+    Security:
 
-    Security group for Image Builder instances
-    S3 bucket for logs with versioning and public access blocking
-    IAM roles and instance profile with necessary permissions
+    Security group allowing only port 443 traffic (inbound and outbound)
+    IAM role with SSM managed policy
+    Instance profile for EC2
 
-    Image Builder Pipeline Configuration:
+    EC2 Instance:
 
-    Creates an Image Builder pipeline that:
-        Uses Amazon Linux 2 as the base image
-        Adds a simple custom component that outputs a test message
-        Configures infrastructure settings (using t2.micro instances)
-        Sets up distribution settings for the resulting AMI
+    Windows Server 2019 instance (t3.medium)
+    50GB GP2 EBS volume
+    Placed in the private subnet
+    Uses latest Windows AMI from SSM Parameter Store
 
-    Launch Template:
+    UserData Script (PowerShell):
 
-    Creates an EC2 launch template for the resulting AMI
-    Configures t3.micro as the instance type
-    Includes basic user data script
+    Creates a TOE directory (C:\TOE)
+    Creates a YAML component file for EC2 Image Builder
+    Downloads AWS TOE executable
+    Creates a test file on the desktop
+    Sets up basic configuration for TOE testing
 
-    Key Components:
+    Important Security Features:
 
-    ImageRecipe: Defines the base image and components to be used
-    ImageComponent: Contains the build steps for customizing the image
-    InfrastructureConfiguration: Specifies where and how to build the image
-    DistributionConfiguration: Defines how the resulting AMI should be distributed
+    Instance is in private subnet (no direct internet access)
+    Access managed through Systems Manager (SSM)
+    Restricted security group rules
 
 
 
